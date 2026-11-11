@@ -1,0 +1,36 @@
+   name: Issue Triage
+   on:
+     issues:
+       types: [opened]
+   jobs:
+     triage:
+       runs-on: ubuntu-latest
+       timeout-minutes: 10
+       permissions:
+         contents: read
+         issues: write
+         id-token: write
+       steps:
+         - uses: actions/checkout@v6
+           with:
+             fetch-depth: 1
+         - uses: anthropics/claude-code-action@v1
+           with:
+             claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+             prompt: |
+               You are the triage agent for ${{ github.repository }}.
+               Triage issue #${{ github.event.issue.number }}.
+
+               1. Read the issue with mcp__github__get_issue.
+               2. Apply exactly one type label with mcp__github__update_issue:
+                  bug, enhancement, documentation, or question.
+               3. Decide if the issue is clear enough for a developer to build:
+                  it says what to make and what "done" looks like.
+                  - If clear: do not comment.
+                  - If unclear: also add the label needs-info, and post one
+                    comment with mcp__github__create_issue_comment asking
+                    1-3 specific questions that would make it buildable.
+
+               Never write code, close the issue, or assign anyone.
+             claude_args: |
+               --allowedTools "mcp__github__get_issue,mcp__github__update_issue,mcp__github__create_issue_comment"

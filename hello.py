@@ -4,6 +4,7 @@ def main():
         print("Error: name cannot be empty.")
         return 1
     print(f"Hello, {name}!")
+    print(f"Goodbye, {name}!")
     return 0
 
 
